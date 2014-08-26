@@ -1,9 +1,38 @@
 <html>
-<head></head>
+<head>
+    <style>
+    .axis path,
+    .axis line {
+        fill: none;
+        stroke: black;
+        shape-rendering: crispEdges;
+    }
+
+    .area {
+        fill: rgba(0,0,255, 0.1);
+        stroke-width: 0;
+    }
+
+    .axis text {
+        font-family: sans-serif;
+        font-size: 11px;
+    }
+
+    .grid .tick {
+        stroke: lightgrey;
+        opacity: 0.7;
+    }
+    .grid path {
+        stroke-width: 0;
+        z-index: 0;
+    }
+    </style>
+</head>
 <body>
     <div id="graph"></div>
     
-    <script src="graphite-lines"></script>
+    <script src='http://cdnjs.cloudflare.com/ajax/libs/d3/3.4.11/d3.min.js'></script>
+    <script src="graphite-lines.js"></script>
     <script>
 
         var lineData = [
@@ -28,6 +57,9 @@
                     ]
             }
         ];
+
+        var graph = new Graph('#graph');
+        graph.data(lineData);
 
     </script>
 </body>
