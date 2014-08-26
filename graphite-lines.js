@@ -8,16 +8,16 @@
             grid = options.grid || true,
             area = options.area || true;
         
+        var svgContainer = d3.select(selector).append("svg")
+                                          .attr("width", width)
+                                          .attr("height", height);
+
         this.data = function (lineData) {
 
             var lineFunction = d3.svg.line()
                                    .x(function(d, i) { return xScale(d[1]) + padding; })
                                    .y(function(d, i) { return yScale(d[0]); })
                                    .interpolate("linear");
-
-            var svgContainer = d3.select(selector).append("svg")
-                                              .attr("width", width)
-                                              .attr("height", height);
 
             var xScale = d3.scale.linear()
                                     .range([0, width+padding])
