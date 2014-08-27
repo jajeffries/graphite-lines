@@ -58,8 +58,11 @@
             }
         ];
 
-        var graph = new Graph('#graph');
-        graph.data(lineData);
+        graphiteline('#graph', {
+            data: lineData,
+            width: 800,
+            height: 600
+        });
 
     </script>
 </body>
