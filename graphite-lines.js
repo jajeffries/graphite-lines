@@ -7,20 +7,25 @@
             padding = options.padding || 60,
             grid = options.grid || true,
             area = options.area || true,
-            lineData = options.data;
+            lineData = options.data,
+            allLineData = [].concat.apply([], options.data.map(function (d) {
+              return d.datapoints;
+            }));
+
+        console.log(allLineData);
         
         var svg = d3.select(selector)
-                             .append("svg")
-                             .attr("width", width)
-                             .attr("height", height);
+                    .append("svg")
+                    .attr("width", width)
+                    .attr("height", height);
 
         var xScale = d3.scale.linear()
                                 .range([0, width+padding])
-                                .domain(d3.extent(lineData[0].datapoints, function(d) { return d[1]; }));
+                                .domain(d3.extent(allLineData, function(d) { return d[1]; }));
 
         var yScale = d3.scale.linear()
                                 .range([height-padding, 0])
-                                .domain(d3.extent(lineData[0].datapoints, function(d) { return d[0]; }));
+                                .domain(d3.extent(allLineData, function(d) { return d[0]; }));
 
         var xAxis = d3.svg.axis()
                           .scale(xScale)
@@ -82,11 +87,14 @@
                                .y(function(d, i) { return yScale(d[0]); })
                                .interpolate("linear");
 
-        svg.append("path")
-           .attr("d", lineFunction(lineData[0].datapoints))
-           .attr("stroke", "blue")
-           .attr("stroke-width", 2)
-           .attr("fill", "none");
+        for(var i=0; i<lineData.length; i++) {
+          svg.append("path")
+             .attr("d", lineFunction(lineData[i].datapoints))
+             .attr("stroke", "blue")
+             .attr("stroke-width", 2)
+             .attr("fill", "none")
+             .classed(lineData[i].target.replace('.','-').toLowerCase());
+        }
     }
     window.graphiteline = graphiteline;
 })(window);
