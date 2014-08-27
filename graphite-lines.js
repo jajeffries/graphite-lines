@@ -7,7 +7,8 @@
             padding = options.padding || 60,
             grid = options.grid || true,
             area = options.area || true,
-            lineData = options.data,
+            lineData = options.data || [],
+            dataLabels = options.dataLabels || true,
             allLineData = [].concat.apply([], options.data.map(function (d) {
               return d.datapoints;
             }));
@@ -91,11 +92,15 @@
 
         for(var i=0; i<lineData.length; i++) {
 
-          svg.append("path")
+          var path = svg.append("path")
              .attr("d", lineFunction(lineData[i].datapoints))
              .attr("stroke", "blue")
              .attr("stroke-width", 3)
-             .attr("fill", "none")
+             .attr("fill", "none");
+             // .classed(lineData[i].target.replace('.','-').toLowerCase());
+
+          if(dataLabels) {
+            path
              .on('mouseover', function () {})
              .on('mousedown', function() {
                 var rangeX = d3.event.x,
@@ -124,6 +129,7 @@
                             .style("stroke-width", "2px")
                             .style("stroke", "darkblue")
                             .style("fill", "lightsteelblue")
+                            .style("opacity", "0.7")
                             .classed("datapoint-label", true);
                 
                 svg.select("text.datapoint-label-text").remove();
@@ -131,13 +137,12 @@
                   .append("text")
                   .attr("x", rangeX + "px")
                   .attr("y", rangeY + "px")
+                  .attr("dy", "0.35em")
                   .text(function () {
-                    console.log(reading + " - " + epochDateFormat(Math.floor(epoch)));
-                    return reading + " - " + epochDateFormat(Math.floor(epoch));
+                    return Math.floor(reading) + " - " + epochDateFormat(Math.floor(epoch));
                   });
-                console.log({"x": epoch, "y": reading})
-             })
-             .classed(lineData[i].target.replace('.','-').toLowerCase());
+             });
+          }
         }
 
         // var vertical = svg
