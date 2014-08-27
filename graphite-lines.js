@@ -11,8 +11,6 @@
             allLineData = [].concat.apply([], options.data.map(function (d) {
               return d.datapoints;
             }));
-
-        console.log(allLineData);
         
         var svg = d3.select(selector)
                     .append("svg")
@@ -27,13 +25,15 @@
                                 .range([height-padding, 0])
                                 .domain(d3.extent(allLineData, function(d) { return d[0]; }));
 
+        function epochDateFormat(d) {
+          var date = new Date(d); 
+          return date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
+        }
+
         var xAxis = d3.svg.axis()
                           .scale(xScale)
                           .ticks(5)
-                          .tickFormat(function(d) { 
-                              var date = new Date(d); 
-                              return date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds(); 
-                          })
+                          .tickFormat(epochDateFormat)
                           .orient("bottom");
 
         svg.append("g")
@@ -87,14 +87,82 @@
                                .y(function(d, i) { return yScale(d[0]); })
                                .interpolate("linear");
 
+        
+
         for(var i=0; i<lineData.length; i++) {
+
           svg.append("path")
              .attr("d", lineFunction(lineData[i].datapoints))
              .attr("stroke", "blue")
-             .attr("stroke-width", 2)
+             .attr("stroke-width", 3)
              .attr("fill", "none")
+             .on('mouseover', function () {})
+             .on('mousedown', function() {
+                var rangeX = d3.event.x,
+                    rangeY = d3.event.y,
+                    epoch = xScale.invert(rangeX),
+                    reading = yScale.invert(rangeY);
+                svg.select("circle.datapoint").remove();
+                svg
+                  .append("circle")
+                  .attr("cx", (rangeX - 10) + "px")
+                  .attr("cy", (rangeY - 10) + "px")
+                  .attr("r", "10px")
+                  .style("stroke-width", "2px")
+                  .style("stroke", "darkblue")
+                  .style("fill", "lightsteelblue")
+                  .style("opacity", "0.7")
+                  .classed("datapoint", true);
+
+                svg.select("rect.datapoint-label").remove();
+                var label = svg
+                            .append("rect")
+                            .attr("x", (rangeX + 10) + "px")
+                            .attr("y", (rangeY - 20) + "px")
+                            .attr("width", "80px")
+                            .attr("height", "20px")
+                            .style("stroke-width", "2px")
+                            .style("stroke", "darkblue")
+                            .style("fill", "lightsteelblue")
+                            .classed("datapoint-label", true);
+                
+                svg.select("text.datapoint-label-text").remove();
+                label
+                  .append("text")
+                  .attr("x", rangeX + "px")
+                  .attr("y", rangeY + "px")
+                  .text(function () {
+                    console.log(reading + " - " + epochDateFormat(Math.floor(epoch)));
+                    return reading + " - " + epochDateFormat(Math.floor(epoch));
+                  });
+                console.log({"x": epoch, "y": reading})
+             })
              .classed(lineData[i].target.replace('.','-').toLowerCase());
         }
+
+        // var vertical = svg
+        //                   .append("div")
+        //                   .style("position", "absolute")
+        //                   .style("width", "1px")
+        //                   .style("height", (height-padding) + "px")
+        //                   .style("top", padding +"px")
+        //                   .style("bottom", "30px")
+        //                   .style("left", "0px")
+        //                   .style("background", "black");
+
+        // svg
+        //   .on("mousemove", function(){ 
+        //     var mousex = d3.mouse(this);
+        //     mousex = mousex[0] + 5;
+        //     console.log("mousemove", mousex);
+        //     vertical.style("left", mousex + "px" );
+        //   })
+        //   .on("mouseover", function(){  
+        //     var mousex = d3.mouse(this);
+        //     mousex = mousex[0] + 5;
+        //     console.log("mouseover", mousex) ;
+        //     vertical.style("left", mousex + "px");
+        //   });
     }
     window.graphiteline = graphiteline;
 })(window);
